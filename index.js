@@ -14,6 +14,8 @@ function validateMovie(genre) {
     const schema = {
         movieGenre : Joi.string.min(2).required()
     };
+
+    return Joi.validate(genre, schema);
 };
 
 app.post('/api/genres/:movieId', (req, res) => {
@@ -38,3 +40,21 @@ app.put('/api/genres/:movieId', (req, res) => {
     genre.movieGenre = req.body.movieGenre;
     res.send(genre);
 });
+
+app.delete('/api/genres/:movieId', (req, req) => {
+    const genre = genres.find(m => m.movieId == (req.params.movieId));
+    if (!genre) return res.status(404).send('The genre with the given id was not found.');
+
+    const index = genres.indexOf(genre);
+    genres.splice(index, 1);
+
+    res.send(genre);
+});
+
+app.get('/api/genres/:movieId', (req, res) => {
+    const genre = genres.find(m => m.movieId == (req.params.movieId));
+    if (!genre) return res.status(404).send('The genre with the given id was not found.');
+    res.send(genre);
+});
+
+
