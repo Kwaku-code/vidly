@@ -22,11 +22,11 @@ router.post('/', async (req, res) => {
     res.send(customer);
 });
 
-router.put('/:customerId', async (req, res) => {
+router.put('/:id', async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const customer = await Customer.findByIdAndUpdate(req.params.customerId, { name: req.body.name }, {
+    const customer = await Customer.findByIdAndUpdate(req.params.id, { name: req.body.name }, {
         new: true
     });
 
@@ -35,16 +35,16 @@ router.put('/:customerId', async (req, res) => {
     res.send(customer);
 });
 
-router.delete('/:customerId', async (req, res) => {
-    const customer = await Customer.findByIdAndRemove(req.params.customerId)
+router.delete('/:id', async (req, res) => {
+    const customer = await Customer.findByIdAndRemove(req.params.id)
 
     if (!customer) return res.status(404).send('The customer with the given id was not found.');
 
     res.send(customer);
 });
 
-router.get('/:customerId', async (req, res) => {
-    const customer = await Customer.findById(req.params.customerId);
+router.get('/:id', async (req, res) => {
+    const customer = await Customer.findById(req.params.id);
 
     if (!customer) return res.status(404).send('The customer with the given id was not found.');
     
