@@ -2,15 +2,14 @@ const request = require('supertest');
 const {Genre} = require('../../models/genre');
 const {User} = require('../../models/user');
 const mongoose = require('mongoose');
-const { describe } = require('joi/lib/types/lazy');
 
 let server;
 
 describe('/api/genres', () => {
     beforeEach(() => { server = require('../../index'); });
-    afterEach(async () => {
+    afterEach(async () => { 
+        server.close();
         await Genre.remove({}); 
-        server.close(); 
     });
 
     describe('GET /', () => {
@@ -25,7 +24,7 @@ describe('/api/genres', () => {
             expect(res.status).toBe(200);
             expect(res.body.length).toBe(2);
             expect(res.body.some(g => g.name === 'genre1')).toBeTruthy();
-            expect(res.body.some(g => g.name=== 'genre2')).toBeTruthy();
+            expect(res.body.some(g => g.name === 'genre2')).toBeTruthy();
         });
     });
 
@@ -113,9 +112,9 @@ describe('/api/genres', () => {
         });
     });
 
-    describbe('PUT /:id', () => {
+    describe('PUT /:id', () => {
         let token;
-        letnewName;
+        let newName;
         let genre;
         let id;
 

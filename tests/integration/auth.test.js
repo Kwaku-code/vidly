@@ -6,8 +6,8 @@ const request = require('supertest');
 describe('auth middleware', () => {
     beforeEach(() => { server = require('../../index'); });
     afterEach(async () => { 
-        await Genre.remove({});
         server.close();
+        await Genre.remove({});
      });
 
     let token;
