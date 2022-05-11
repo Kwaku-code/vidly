@@ -15,13 +15,13 @@ router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const genre = new Genre ({ name: req.body.name });
-    await genre.save();
+    let genre = new Genre ({ name: req.body.name });
+    genre = await genre.save();
 
     res.send(genre);
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', [auth, validateObjectId], async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
