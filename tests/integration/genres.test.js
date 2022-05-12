@@ -1,26 +1,28 @@
 const request = require('supertest');
-const {Genre} = require('../../models/genre');
-const {User} = require('../../models/user');
+const { Genre } = require('../../models/genre');
+const { User } = require('../../models/user');
 const mongoose = require('mongoose');
 
 let server;
 
 describe('/api/genres', () => {
-    beforeEach(() => { server = require('../../index'); });
-    afterEach(async () => { 
-        await server.close();
-        await Genre.remove({}); 
+    beforeEach(() => { server = require('../../index'); })
+    afterEach(async () => {
+        server.close();
+        await Genre.remove({});
     });
 
     describe('GET /', () => {
         it('should return all genres', async () => {
-            await Genre.collection.insertMany([
+            const genres = [
                 { name: 'genre1' },
-                { name: 'genre2' }
-            ]);
- 
+                { name: 'genre2' },
+            ];
+
+            await Genre.collection.insertMany(genres);
+
             const res = await request(server).get('/api/genres');
-            
+
             expect(res.status).toBe(200);
             expect(res.body.length).toBe(2);
             expect(res.body.some(g => g.name === 'genre1')).toBeTruthy();
@@ -38,9 +40,7 @@ describe('/api/genres', () => {
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('name', genre.name);
         });
-    });
 
-    describe('GET /:id', () => {
         it('should return 404 if invalid id is passed', async () => {
             const res = await request(server).get('/api/genres/1');
 
@@ -56,7 +56,6 @@ describe('/api/genres', () => {
     });
 
     describe('POST /', () => {
-
         let token;
         let name;
 
@@ -70,7 +69,7 @@ describe('/api/genres', () => {
         beforeEach(() => {
             token = new User().generateAuthToken();
             name = 'genre1';
-        });
+        })
 
         it('should return 401 if client is not logged in', async () => {
             token = '';
@@ -82,7 +81,7 @@ describe('/api/genres', () => {
 
         it('should return 400 if genre is less than 5 characters', async () => {
             name = '1234';
-            
+
             const res = await exec();
 
             expect(res.status).toBe(400);
@@ -103,7 +102,7 @@ describe('/api/genres', () => {
 
             expect(genre).not.toBeNull();
         });
-        
+
         it('should return the genre if it is valid', async () => {
             const res = await exec();
 
@@ -122,12 +121,12 @@ describe('/api/genres', () => {
             return await request(server)
                 .put('/api/genres/' + id)
                 .set('x-auth-token', token)
-                .send({ name: newName});
+                .send({ name: newName });
         }
 
         beforeEach(async () => {
             // Before each test create a genre 
-            // put it in the database.
+            // put it in the database.      
             genre = new Genre({ name: 'genre1' });
             await genre.save();
 
@@ -160,13 +159,13 @@ describe('/api/genres', () => {
             expect(res.status).toBe(400);
         });
 
-        // it('should return 404 if id is invalid', async () => {
-        //     id = 1;
+        it('should return 404 if id is invalid', async () => {
+            id = 1;
 
-        //     const res = await exec();
+            const res = await exec();
 
-        //     expect(res.status).toBe(404);
-        // });
+            expect(res.status).toBe(404);
+        });
 
         it('should return 404 if genre with the given id was not found', async () => {
             id = mongoose.Types.ObjectId();
@@ -176,7 +175,7 @@ describe('/api/genres', () => {
             expect(res.status).toBe(404);
         });
 
-        it('should update genre if input is valid', async () => {
+        it('should update the genre if input is valid', async () => {
             await exec();
 
             const updatedGenre = await Genre.findById(genre._id);
@@ -192,73 +191,73 @@ describe('/api/genres', () => {
         });
     });
 
-    // describe('DELETE /:id', () => {
-    //     let token;
-    //     let genre;
-    //     let id;
+    describe('DELETE /:id', () => {
+        let token;
+        let genre;
+        let id;
 
-    //     const exec = async () => {
-    //         return await request(server)
-    //             .put('/api/genres/' + id)
-    //             .set('x-auth-token', token)
-    //             .send();
-    //     }
+        const exec = async () => {
+            return await request(server)
+                .delete('/api/genres/' + id)
+                .set('x-auth-token', token)
+                .send();
+        }
 
-    //     beforeEach(async () => {
-    //         // Before each test create a genre 
-    //         // put it in the database.
-    //         genre = new Genre({ name: 'genre1' });
-    //         await genre.save();
+        beforeEach(async () => {
+            // Before each test create a genre 
+            // put it in the database.      
+            genre = new Genre({ name: 'genre1' });
+            await genre.save();
 
-    //         id = genre._id;
-    //         token = new User({ isAdmin: true }).generateAuthToken();
-    //     })
+            id = genre._id;
+            token = new User({ isAdmin: true }).generateAuthToken();
+        })
 
-    //     it('should return 401 if client is not logged in', async () => {
-    //         token = '';
+        it('should return 401 if client is not logged in', async () => {
+            token = '';
 
-    //         const res = await exec();
+            const res = await exec();
 
-    //         expect(res.status).toBe(401);
-    //     });
+            expect(res.status).toBe(401);
+        });
 
-    //     it('should return 403 if user is not an admin', async () => {
-    //         token = new User({ isAdmin: true }).generateAuthToken();
+        it('should return 403 if the user is not an admin', async () => {
+            token = new User({ isAdmin: false }).generateAuthToken();
 
-    //         const res = await exec();
+            const res = await exec();
 
-    //         expect(res.status).toBe(403);
-    //     });
+            expect(res.status).toBe(403);
+        });
 
-    //     it('should return 404 if id is invalid', async () => {
-    //         id = 1;
+        it('should return 404 if id is invalid', async () => {
+            id = 1;
 
-    //         const res = await exec();
+            const res = await exec();
 
-    //         expect(res.status).toBe(404);
-    //     });
+            expect(res.status).toBe(404);
+        });
 
-    //     it('should return 404 if no genre with the given id was found', async () => {
-    //         id = mongoose.Types.ObjectId();
+        it('should return 404 if no genre with the given id was found', async () => {
+            id = mongoose.Types.ObjectId();
 
-    //         const res = await exec();
+            const res = await exec();
 
-    //         expect(res.status).toBe(404);
-    //     });
+            expect(res.status).toBe(404);
+        });
 
-    //     it('should delete the genre if input is valid', async () => {
-    //         await exec();
+        it('should delete the genre if input is valid', async () => {
+            await exec();
 
-    //         const genreInDb = await Genre.findById(id);
+            const genreInDb = await Genre.findById(id);
 
-    //         expect(genreInDb).toBeNull();
-    //     });
+            expect(genreInDb).toBeNull();
+        });
 
-    //     it('should return the removed genre', async () => {
-    //         const res = await exec();
+        it('should return the removed genre', async () => {
+            const res = await exec();
 
-    //         expect(res.body).toHaveProperty('_id', genre._id.toHexString());
-    //         expect(res.body).toHaveProperty('name', genre.name);
-    //     });
-    // }); 
+            expect(res.body).toHaveProperty('_id', genre._id.toHexString());
+            expect(res.body).toHaveProperty('name', genre.name);
+        });
+    });
 });
