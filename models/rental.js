@@ -19,7 +19,7 @@ const rentalSchema = new mongoose.Schema({
                 type: String,
                 required: true,
                 minlenght: 5,
-                maxlength: 13
+                maxlength: 50
             }
         }),
         required: true

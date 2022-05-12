@@ -3,10 +3,9 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
-const { User, validate} = require('../models/user');
+const {User, validate} = require('../models/user');
 const mongoose = require('mongoose');
 const express = require('express');
-const { send } = require('express/lib/response');
 const router = express.Router();
 
 router.get('/me', auth, async (req, res) => {
