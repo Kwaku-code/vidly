@@ -49,7 +49,7 @@ describe('/api/returns', () => {
             }
         });
         await rental.save();
-    });
+    }, jest.setTimeout(10000));
 
     afterEach(async () => { 
         await server.close();
