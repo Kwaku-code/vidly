@@ -29,7 +29,7 @@ function validateReturn(req) {
         movieId: Joi.objectId().required()
     };
 
-    return Joi.validate(genre, schema);
+    return Joi.validate(req, schema);
 };
 
 module.exports = router;

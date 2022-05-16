@@ -49,10 +49,10 @@ describe('/api/returns', () => {
             }
         });
         await rental.save();
-    }, jest.setTimeout(10000));
+    }, 10000);
 
     afterEach(async () => { 
-        await server.close();
+        server.close();
         await Rental.remove({});
         await Movie.remove({});
     });
